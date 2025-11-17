@@ -8,8 +8,31 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
+interface QuickAction {
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  href: string;
+  color: string;
+}
+
+interface Seller {
+  name: string;
+  purchases: string;
+  categories: string;
+  total: string;
+}
+
+interface ProductOverview {
+  name: string;
+  id: string;
+  price: string;
+  quantity: string;
+  status: string;
+}
+
 const DashboardPage: React.FC = () => {
-  const quickActions = [
+  const quickActions: QuickAction[] = [
     {
       title: 'Add Product',
       description: 'Add new product to inventory',
@@ -79,7 +102,7 @@ const DashboardPage: React.FC = () => {
                 { name: 'Robert', purchases: '73 Purchases', categories: 'Kitchen, Pets', total: '$1,000' },
                 { name: 'Calvin', purchases: '66 Purchases', categories: 'Health, Grocery', total: '$4,000' },
                 { name: 'Dwight', purchases: '15,800 Purchases', categories: 'Electronics', total: '$2,700' }
-              ].map((seller) => (
+              ].map((seller: Seller) => (
                 <div key={seller.name} className="flex items-center space-x-4">
                   <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
                     <span className="text-sm font-medium">{seller.name.charAt(0)}</span>
@@ -127,7 +150,7 @@ const DashboardPage: React.FC = () => {
                     { name: 'Soft Fluffy Cats', id: '#327', price: '$11.70', quantity: '28', status: 'On Sale' },
                     { name: 'Taste of the Wild Formula Finder', id: '#380', price: '$8.99', quantity: '10', status: 'On Sale' },
                     { name: 'Wellness Natural Food', id: '#126', price: '$5.32', quantity: '578', status: 'Low Stock' }
-                  ].map((product) => (
+                  ].map((product: ProductOverview) => (
                     <tr key={product.id} className="border-t">
                       <td className="py-3">
                         <div className="flex items-center space-x-3">

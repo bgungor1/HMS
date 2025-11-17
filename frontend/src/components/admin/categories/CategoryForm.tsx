@@ -23,7 +23,7 @@ const CategoryForm: React.FC = () => {
     name: '',
     icon: '',
     isActive: true,
-    parentCategory: ''
+    parentCategory: 'none'
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -86,7 +86,7 @@ const CategoryForm: React.FC = () => {
                   <SelectValue placeholder="Select parent category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No Parent</SelectItem>
+                  <SelectItem value="none">No Parent</SelectItem>
                   <SelectItem value="hotels">Hotels</SelectItem>
                   <SelectItem value="villas">Villas</SelectItem>
                   <SelectItem value="resorts">Resorts</SelectItem>

@@ -6,9 +6,22 @@ import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import HotelList from '@/components/admin/products/HotelList';
 
+interface Hotel {
+  id: string;
+  name: string;
+  location: string;
+  stars: number;
+  price: string;
+  rooms: number;
+  occupancy: number;
+  status: string;
+  startDate: string;
+  image: string;
+}
+
 const ProductListPage: React.FC = () => {
   // Otel verileri - aynı veriyi tekrar kullanarak
-  const hotelData = [
+  const hotelData: Hotel[] = [
     {
       id: 'HOT001',
       name: 'Grand Hotel Istanbul',
