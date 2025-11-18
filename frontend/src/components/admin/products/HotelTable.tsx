@@ -21,16 +21,14 @@ interface HotelTableProps {
   hotels: Hotel[];
   onDelete: (hotelId: string) => void;
   onEdit: (hotelId: string) => void;
-  onView: (hotelId: string) => void;
   isLoading?: boolean;
 }
 
-const HotelTable: React.FC<HotelTableProps> = ({ 
-  hotels, 
-  onDelete, 
-  onEdit, 
-  onView, 
-  isLoading = false 
+const HotelTable: React.FC<HotelTableProps> = ({
+  hotels,
+  onDelete,
+  onEdit,
+  isLoading = false
 }) => {
   if (isLoading) {
     return (
@@ -99,7 +97,6 @@ const HotelTable: React.FC<HotelTableProps> = ({
                   hotel={hotel}
                   onDelete={onDelete}
                   onEdit={onEdit}
-                  onView={onView}
                 />
               ))}
             </tbody>

@@ -4,6 +4,14 @@ import React from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Eye, Edit, Trash2, Star } from 'lucide-react';
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 interface HotelCardProps {
   hotel: {
@@ -20,10 +28,9 @@ interface HotelCardProps {
   };
   onDelete: (hotelId: string) => void;
   onEdit: (hotelId: string) => void;
-  onView: (hotelId: string) => void;
 }
 
-const HotelCard: React.FC<HotelCardProps> = ({ hotel, onDelete, onEdit, onView }) => {
+const HotelCard: React.FC<HotelCardProps> = ({ hotel, onDelete, onEdit }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Available':
@@ -136,15 +143,57 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, onDelete, onEdit, onView }
       {/* Actions */}
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center space-x-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors"
-            onClick={() => onView(hotel.id)}
-            title="View Details"
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors"
+                title="View Details"
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{hotel.name} Detayları</DialogTitle>
+                <DialogDescription>
+                  Otel ID: {hotel.id}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <p className="text-sm font-medium">Lokasyon:</p>
+                  <p className="col-span-3 text-sm text-muted-foreground">{hotel.location}</p>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <p className="text-sm font-medium">Yıldız:</p>
+                  <p className="col-span-3 text-sm text-muted-foreground">{hotel.stars}</p>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <p className="text-sm font-medium">Fiyat:</p>
+                  <p className="col-span-3 text-sm text-muted-foreground">{hotel.price}</p>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <p className="text-sm font-medium">Oda Sayısı:</p>
+                  <p className="col-span-3 text-sm text-muted-foreground">{hotel.rooms}</p>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <p className="text-sm font-medium">Doluluk:</p>
+                  <p className="col-span-3 text-sm text-muted-foreground">{hotel.occupancy}%</p>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <p className="text-sm font-medium">Durum:</p>
+                  <p className="col-span-3 text-sm text-muted-foreground">{hotel.status}</p>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <p className="text-sm font-medium">Başlangıç Tarihi:</p>
+                  <p className="col-span-3 text-sm text-muted-foreground">{hotel.startDate}</p>
+                </div>
+                {/* HotelImage burada gösterilecek */}
+              </div>
+            </DialogContent>
+          </Dialog>
           <Button
             variant="ghost"
             size="sm"

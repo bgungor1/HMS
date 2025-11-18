@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import HotelList from '@/components/admin/products/HotelList';
+import { useRouter } from 'next/navigation';
 
 interface Hotel {
   id: string;
@@ -20,6 +21,8 @@ interface Hotel {
 }
 
 const ProductListPage: React.FC = () => {
+  const router = useRouter();
+
   // Otel verileri - aynı veriyi tekrar kullanarak
   const hotelData: Hotel[] = [
     {
@@ -151,12 +154,11 @@ const ProductListPage: React.FC = () => {
 
   const handleEdit = (hotelId: string) => {
     console.log('Editing hotel:', hotelId);
-    // Burada düzenleme sayfasına yönlendirme yapılacak
+    router.push(`/admin/products/edit/${hotelId}`);
   };
 
   const handleView = (hotelId: string) => {
     console.log('Viewing hotel:', hotelId);
-    // Burada görüntüleme sayfasına yönlendirme yapılacak
   };
 
   return (

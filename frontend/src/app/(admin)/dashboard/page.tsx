@@ -1,12 +1,20 @@
 'use client';
 
 import React from 'react';
-import { Plus, UserPlus, FileText, Settings } from 'lucide-react';
+import { Plus, UserPlus, FileText, Settings, Edit, Trash2, Eye } from 'lucide-react';
 import StatsCards from '@/components/admin/dashboard/StatsCards';
 import RecentOrders from '@/components/admin/dashboard/RecentOrders';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 interface QuickAction {
   title: string;
@@ -29,9 +37,13 @@ interface ProductOverview {
   price: string;
   quantity: string;
   status: string;
+  description?: string; // Yeni eklendi
 }
 
 const DashboardPage: React.FC = () => {
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [selectedProduct, setSelectedProduct] = React.useState<ProductOverview | null>(null);
+
   const quickActions: QuickAction[] = [
     {
       title: 'Add Product',
@@ -143,13 +155,14 @@ const DashboardPage: React.FC = () => {
                     <th className="pb-3">Price</th>
                     <th className="pb-3">Quantity</th>
                     <th className="pb-3">Sale</th>
+                    <th className="pb-3 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="space-y-2">
                   {[
-                    { name: 'Soft Fluffy Cats', id: '#327', price: '$11.70', quantity: '28', status: 'On Sale' },
-                    { name: 'Taste of the Wild Formula Finder', id: '#380', price: '$8.99', quantity: '10', status: 'On Sale' },
-                    { name: 'Wellness Natural Food', id: '#126', price: '$5.32', quantity: '578', status: 'Low Stock' }
+                    { name: 'Soft Fluffy Cats', id: '#327', price: '$11.70', quantity: '28', status: 'On Sale', description: 'Yumuşak ve sevimli kediler için mama.' },
+                    { name: 'Taste of the Wild Formula Finder', id: '#380', price: '$8.99', quantity: '10', status: 'On Sale', description: 'Vahşi doğanın tadını sunan özel formül.' },
+                    { name: 'Wellness Natural Food', id: '#126', price: '$5.32', quantity: '578', status: 'Low Stock', description: 'Sağlıklı ve doğal içerikli kedi maması.' }
                   ].map((product: ProductOverview) => (
                     <tr key={product.id} className="border-t">
                       <td className="py-3">
@@ -171,6 +184,59 @@ const DashboardPage: React.FC = () => {
                         }`}>
                           {product.status}
                         </span>
+                      </td>
+                      <td className="py-3 text-right flex justify-end space-x-2">
+                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                setSelectedProduct(product);
+                              }}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          {selectedProduct && (
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>{selectedProduct.name} Detayları</DialogTitle>
+                                <DialogDescription>
+                                  Ürün ID: {selectedProduct.id}
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <p className="text-sm font-medium">Fiyat:</p>
+                                  <p className="col-span-3 text-sm text-muted-foreground">{selectedProduct.price}</p>
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <p className="text-sm font-medium">Miktar:</p>
+                                  <p className="col-span-3 text-sm text-muted-foreground">{selectedProduct.quantity}</p>
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <p className="text-sm font-medium">Durum:</p>
+                                  <p className="col-span-3 text-sm text-muted-foreground">{selectedProduct.status}</p>
+                                </div>
+                                {selectedProduct.description && (
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <p className="text-sm font-medium">Açıklama:</p>
+                                    <p className="col-span-3 text-sm text-muted-foreground">{selectedProduct.description}</p>
+                                  </div>
+                                )}
+                              </div>
+                            </DialogContent>
+                          )}
+                        </Dialog>
+                        <Link href={`/admin/products/edit/${product.id}`}>
+                          <Button variant="ghost" size="icon">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <Button variant="ghost" size="icon" onClick={() => console.log(`Delete product ${product.id}`)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </td>
                     </tr>
                   ))}
