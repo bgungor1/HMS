@@ -39,10 +39,25 @@ const GalleryGrid: React.FC<GalleryGridProps> = ({
 }) => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const filteredImages = images.filter(image =>
     image.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleUploadButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      console.log('Selected files for upload:', files);
+      // Burada dosyaları sunucuya yükleme mantığı eklenecek
+      // Örneğin: uploadFiles(files);
+      // Şimdilik sadece konsola yazdırıyoruz.
+    }
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -61,7 +76,19 @@ const GalleryGrid: React.FC<GalleryGridProps> = ({
       {/* Toolbar */}
       <div className="flex items-center justify-between p-6 bg-white border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <Button variant="outline" size="sm" className="flex items-center space-x-2">
+          <Input
+            type="file"
+            multiple
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center space-x-2"
+            onClick={handleUploadButtonClick}
+          >
             <Upload className="h-4 w-4" />
             <span>Upload</span>
           </Button>

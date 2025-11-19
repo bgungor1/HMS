@@ -24,6 +24,15 @@ import {
   FileText,
   Download
 } from 'lucide-react';
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { useRouter } from 'next/navigation';
 
 interface OrderData {
   id: string;
@@ -37,6 +46,7 @@ interface OrderData {
   checkIn: string;
   checkOut: string;
   orderDate: string;
+  description?: string; // Yeni eklendi
 }
 
 const OrderTable: React.FC = () => {
@@ -44,6 +54,9 @@ const OrderTable: React.FC = () => {
   const [entriesPerPage, setEntriesPerPage] = useState('10');
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [selectedOrder, setSelectedOrder] = React.useState<OrderData | null>(null);
+  const router = useRouter();
 
   // Otel rezervasyon siparişleri
   const orders: OrderData[] = [
@@ -58,7 +71,8 @@ const OrderTable: React.FC = () => {
       status: 'confirmed', 
       checkIn: '25 Jan 2024',
       checkOut: '28 Jan 2024',
-      orderDate: '15 Jan 2024'
+      orderDate: '15 Jan 2024',
+      description: 'İstanbul\'da lüks bir otel rezervasyonu.'
     },
     { 
       id: '2', 
@@ -71,7 +85,8 @@ const OrderTable: React.FC = () => {
       status: 'pending', 
       checkIn: '02 Feb 2024',
       checkOut: '07 Feb 2024',
-      orderDate: '16 Jan 2024'
+      orderDate: '16 Jan 2024',
+      description: 'Antalya\'da deniz kenarı tatil köyü rezervasyonu.'
     },
     { 
       id: '3', 
@@ -84,7 +99,8 @@ const OrderTable: React.FC = () => {
       status: 'confirmed', 
       checkIn: '20 Jan 2024',
       checkOut: '22 Jan 2024',
-      orderDate: '17 Jan 2024'
+      orderDate: '17 Jan 2024',
+      description: 'Kapadokya\'da butik otel rezervasyonu.'
     },
     { 
       id: '4', 
@@ -97,7 +113,8 @@ const OrderTable: React.FC = () => {
       status: 'cancelled', 
       checkIn: '10 Feb 2024',
       checkOut: '14 Feb 2024',
-      orderDate: '18 Jan 2024'
+      orderDate: '18 Jan 2024',
+      description: 'Uludağ\'da dağ manzaralı tatil köyü rezervasyonu (iptal edildi).',
     },
     { 
       id: '5', 
@@ -110,7 +127,8 @@ const OrderTable: React.FC = () => {
       status: 'confirmed', 
       checkIn: '15 Feb 2024',
       checkOut: '21 Feb 2024',
-      orderDate: '19 Jan 2024'
+      orderDate: '19 Jan 2024',
+      description: 'Bodrum\'da lüks villa rezervasyonu.',
     },
     { 
       id: '6', 
@@ -123,7 +141,8 @@ const OrderTable: React.FC = () => {
       status: 'pending', 
       checkIn: '05 Feb 2024',
       checkOut: '07 Feb 2024',
-      orderDate: '20 Jan 2024'
+      orderDate: '20 Jan 2024',
+      description: 'Ankara\'da şehir merkezi otel rezervasyonu.',
     },
     { 
       id: '7', 
@@ -136,7 +155,8 @@ const OrderTable: React.FC = () => {
       status: 'confirmed', 
       checkIn: '12 Feb 2024',
       checkOut: '16 Feb 2024',
-      orderDate: '21 Jan 2024'
+      orderDate: '21 Jan 2024',
+      description: 'Pamukkale\'de spa ve sağlıklı yaşam oteli rezervasyonu.',
     },
     { 
       id: '8', 
@@ -149,7 +169,8 @@ const OrderTable: React.FC = () => {
       status: 'cancelled', 
       checkIn: '08 Feb 2024',
       checkOut: '11 Feb 2024',
-      orderDate: '22 Jan 2024'
+      orderDate: '22 Jan 2024',
+      description: 'Sultanahmet\'te tarihi otel rezervasyonu (iptal edildi).',
     },
   ];
 
@@ -167,7 +188,24 @@ const OrderTable: React.FC = () => {
   const paginatedOrders = filteredOrders.slice(startIndex, startIndex + parseInt(entriesPerPage));
 
   const handleAction = (action: string, orderId: string) => {
-    console.log(`${action} order:`, orderId);
+    const order = orders.find(ord => ord.id === orderId);
+    if (!order) return;
+
+    switch (action) {
+      case 'view':
+        setSelectedOrder(order);
+        setIsDialogOpen(true);
+        break;
+      case 'edit':
+        router.push(`/admin/order/detail/${orderId}`); // Veya /admin/order/edit/${orderId} eğer düzenleme sayfası varsa
+        break;
+      case 'delete':
+        console.log(`Deleting order: ${orderId}`);
+        // Silme işlemi burada yapılacak
+        break;
+      default:
+        console.log(`Unknown action: ${action} for order: ${orderId}`);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -332,15 +370,65 @@ const OrderTable: React.FC = () => {
                   </TableCell>
                   <TableCell className="py-6 px-2">
                     <div className="flex items-center justify-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleAction('view', order.id)}
-                        className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded"
-                        title="Görüntüle"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
+                      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleAction('view', order.id)}
+                            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded"
+                            title="Görüntüle"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        {selectedOrder && selectedOrder.id === order.id && (
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>{selectedOrder.hotelName} ({selectedOrder.orderID}) Detayları</DialogTitle>
+                              <DialogDescription>
+                                Müşteri: {selectedOrder.customerName}
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <p className="text-sm font-medium">Toplam Fiyat:</p>
+                                <p className="col-span-3 text-sm text-muted-foreground">₺{selectedOrder.price.toLocaleString('tr-TR', { minimumFractionDigits: 0 })}</p>
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <p className="text-sm font-medium">Gece Sayısı:</p>
+                                <p className="col-span-3 text-sm text-muted-foreground">{selectedOrder.nights}</p>
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <p className="text-sm font-medium">Misafir Sayısı:</p>
+                                <p className="col-span-3 text-sm text-muted-foreground">{selectedOrder.guests}</p>
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <p className="text-sm font-medium">Durum:</p>
+                                <p className="col-span-3 text-sm text-muted-foreground">{getStatusBadge(selectedOrder.status)}</p>
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <p className="text-sm font-medium">Giriş Tarihi:</p>
+                                <p className="col-span-3 text-sm text-muted-foreground">{selectedOrder.checkIn}</p>
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <p className="text-sm font-medium">Çıkış Tarihi:</p>
+                                <p className="col-span-3 text-sm text-muted-foreground">{selectedOrder.checkOut}</p>
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <p className="text-sm font-medium">Sipariş Tarihi:</p>
+                                <p className="col-span-3 text-sm text-muted-foreground">{selectedOrder.orderDate}</p>
+                              </div>
+                              {selectedOrder.description && (
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <p className="text-sm font-medium">Açıklama:</p>
+                                  <p className="col-span-3 text-sm text-muted-foreground">{selectedOrder.description}</p>
+                                </div>
+                              )}
+                            </div>
+                          </DialogContent>
+                        )}
+                      </Dialog>
                       <Button
                         variant="ghost"
                         size="sm"

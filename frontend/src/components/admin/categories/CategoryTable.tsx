@@ -30,7 +30,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import CategoryForm from './CategoryForm';
+import { useRouter } from 'next/navigation';
 
 interface CategoryData {
   id: string;
@@ -39,25 +48,29 @@ interface CategoryData {
   quantity: number;
   sale: number;
   startDate: string;
+  description?: string; // Yeni eklendi
 }
 
 const CategoryTable: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [entriesPerPage, setEntriesPerPage] = useState('10');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [selectedCategory, setSelectedCategory] = React.useState<CategoryData | null>(null);
+  const router = useRouter();
 
   // Otel/Villa temalı kategoriler
   const categories: CategoryData[] = [
-    { id: '1', category: 'Luxury Hotels', icon: '🏨', quantity: 125, sale: 15, startDate: '15 Jan 2024' },
-    { id: '2', category: 'Boutique Hotels', icon: '🏛️', quantity: 89, sale: 12, startDate: '18 Jan 2024' },
-    { id: '3', category: 'Beach Resorts', icon: '🏖️', quantity: 67, sale: 22, startDate: '20 Jan 2024' },
-    { id: '4', category: 'Mountain Villas', icon: '🏔️', quantity: 45, sale: 8, startDate: '22 Jan 2024' },
-    { id: '5', category: 'City Center Hotels', icon: '🏙️', quantity: 156, sale: 18, startDate: '25 Jan 2024' },
-    { id: '6', category: 'Business Hotels', icon: '💼', quantity: 98, sale: 14, startDate: '28 Jan 2024' },
-    { id: '7', category: 'Spa & Wellness', icon: '🧘', quantity: 34, sale: 25, startDate: '02 Feb 2024' },
-    { id: '8', category: 'Historic Hotels', icon: '🏰', quantity: 23, sale: 10, startDate: '05 Feb 2024' },
-    { id: '9', category: 'Seaside Villas', icon: '🌊', quantity: 78, sale: 20, startDate: '08 Feb 2024' },
-    { id: '10', category: 'Eco Lodges', icon: '🌿', quantity: 52, sale: 16, startDate: '12 Feb 2024' },
+    { id: '1', category: 'Luxury Hotels', icon: '🏨', quantity: 125, sale: 15, startDate: '15 Jan 2024', description: 'Lüks otel kategorisi' },
+    { id: '2', category: 'Boutique Hotels', icon: '🏛️', quantity: 89, sale: 12, startDate: '18 Jan 2024', description: 'Butik otel kategorisi' },
+    { id: '3', category: 'Beach Resorts', icon: '🏖️', quantity: 67, sale: 22, startDate: '20 Jan 2024', description: 'Sahil tesisleri kategorisi' },
+    { id: '4', category: 'Mountain Villas', icon: '🏔️', quantity: 45, sale: 8, startDate: '22 Jan 2024', description: 'Dağ villaları kategorisi' },
+    { id: '5', category: 'City Center Hotels', icon: '🏙️', quantity: 156, sale: 18, startDate: '25 Jan 2024', description: 'Şehir merkezi otelleri kategorisi' },
+    { id: '6', category: 'Business Hotels', icon: '💼', quantity: 98, sale: 14, startDate: '28 Jan 2024', description: 'İş otelleri kategorisi' },
+    { id: '7', category: 'Spa & Wellness', icon: '🧘', quantity: 34, sale: 25, startDate: '02 Feb 2024', description: 'Spa ve Sağlık kategorisi' },
+    { id: '8', category: 'Historic Hotels', icon: '🏰', quantity: 23, sale: 10, startDate: '05 Feb 2024', description: 'Tarihi oteller kategorisi' },
+    { id: '9', category: 'Seaside Villas', icon: '🌊', quantity: 78, sale: 20, startDate: '08 Feb 2024', description: 'Deniz kenarı villalar kategorisi' },
+    { id: '10', category: 'Eco Lodges', icon: '🌿', quantity: 52, sale: 16, startDate: '12 Feb 2024', description: 'Eko konaklama kategorisi' },
   ];
 
   // Filtrelenmiş kategoriler
@@ -70,7 +83,24 @@ const CategoryTable: React.FC = () => {
   const paginatedCategories = filteredCategories.slice(startIndex, startIndex + parseInt(entriesPerPage));
 
   const handleAction = (action: string, categoryId: string) => {
-    console.log(`${action} category:`, categoryId);
+    const category = categories.find(cat => cat.id === categoryId);
+    if (!category) return;
+
+    switch (action) {
+      case 'view':
+        setSelectedCategory(category);
+        setIsDialogOpen(true);
+        break;
+      case 'edit':
+        router.push(`/admin/categories/edit/${categoryId}`);
+        break;
+      case 'delete':
+        console.log(`Deleting category: ${categoryId}`);
+        // Silme işlemi burada yapılacak
+        break;
+      default:
+        console.log(`Unknown action: ${action} for category: ${categoryId}`);
+    }
   };
 
   return (
@@ -156,14 +186,52 @@ const CategoryTable: React.FC = () => {
                   </TableCell>
                   <TableCell className="text-right py-6 px-8">
                     <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleAction('view', category.id)}
-                        className="h-10 w-10 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg"
-                      >
-                        <Eye className="h-5 w-5" />
-                      </Button>
+                      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleAction('view', category.id)}
+                            className="h-10 w-10 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg"
+                          >
+                            <Eye className="h-5 w-5" />
+                          </Button>
+                        </DialogTrigger>
+                        {selectedCategory && selectedCategory.id === category.id && (
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>{selectedCategory.category} Detayları</DialogTitle>
+                              <DialogDescription>
+                                Kategori ID: {selectedCategory.id}
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <p className="text-sm font-medium">İkon:</p>
+                                <p className="col-span-3 text-2xl text-muted-foreground">{selectedCategory.icon}</p>
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <p className="text-sm font-medium">Miktar:</p>
+                                <p className="col-span-3 text-sm text-muted-foreground">{selectedCategory.quantity}</p>
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <p className="text-sm font-medium">Satış:</p>
+                                <p className="col-span-3 text-sm text-muted-foreground">{selectedCategory.sale}</p>
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <p className="text-sm font-medium">Başlangıç Tarihi:</p>
+                                <p className="col-span-3 text-sm text-muted-foreground">{selectedCategory.startDate}</p>
+                              </div>
+                              {selectedCategory.description && (
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <p className="text-sm font-medium">Açıklama:</p>
+                                  <p className="col-span-3 text-sm text-muted-foreground">{selectedCategory.description}</p>
+                                </div>
+                              )}
+                            </div>
+                          </DialogContent>
+                        )}
+                      </Dialog>
                       <Button
                         variant="ghost"
                         size="sm"
