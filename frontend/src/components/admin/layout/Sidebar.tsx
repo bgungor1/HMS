@@ -7,15 +7,10 @@ import {
   LayoutDashboard, 
   ShoppingCart, 
   Users, 
-  MapPin, 
- 
-  Database,
   ChevronDown,
   Menu,
   X,
   Layers,
-
-  BarChart3,
   FileText,
   ImageIcon
 } from 'lucide-react';

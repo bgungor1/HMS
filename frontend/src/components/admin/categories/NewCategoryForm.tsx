@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { Upload, ImageIcon } from 'lucide-react';
+import { Upload } from 'lucide-react';
+import Image from 'next/image';
 
 interface CategoryFormData {
   productName: string;
@@ -23,7 +24,7 @@ const NewCategoryForm: React.FC = () => {
 
   const [dragActive, setDragActive] = useState(false);
 
-  const handleInputChange = (field: keyof CategoryFormData, value: any) => {
+  const handleInputChange = (field: keyof CategoryFormData, value: string | File[]) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -44,7 +45,7 @@ const NewCategoryForm: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const files = Array.from(e.dataTransfer.files);
       handleInputChange('uploadedImages', [...formData.uploadedImages, ...files]);
@@ -102,11 +103,10 @@ const NewCategoryForm: React.FC = () => {
               Upload images <span className="text-red-500">*</span>
             </Label>
             <div
-              className={`relative border-2 border-dashed rounded-xl p-12 text-center transition-all duration-200 ${
-                dragActive 
-                  ? 'border-blue-400 bg-blue-50' 
+              className={`relative border-2 border-dashed rounded-xl p-12 text-center transition-all duration-200 ${dragActive
+                  ? 'border-blue-400 bg-blue-50'
                   : 'border-blue-300 bg-gray-50'
-              }`}
+                }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
@@ -134,16 +134,19 @@ const NewCategoryForm: React.FC = () => {
                 />
               </div>
             </div>
-            
+
             {/* Display uploaded images */}
             {formData.uploadedImages.length > 0 && (
               <div className="grid grid-cols-4 gap-4 mt-4">
                 {formData.uploadedImages.map((file, index) => (
                   <div key={index} className="relative">
-                    <img
+                    <Image
                       src={URL.createObjectURL(file)}
                       alt={`Upload ${index + 1}`}
+                      width={80}
+                      height={80}
                       className="w-full h-20 object-cover rounded-lg border"
+                      unoptimized
                     />
                     <button
                       type="button"
@@ -185,8 +188,8 @@ const NewCategoryForm: React.FC = () => {
 
           {/* Submit Button */}
           <div className="pt-4">
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-base font-medium rounded-lg"
               disabled={!formData.productName.trim() || formData.uploadedImages.length === 0}
             >
