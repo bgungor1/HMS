@@ -1,19 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import EditPageForm from '@/components/admin/pages/EditPageForm';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-const EditPagePage: React.FC = () => {
+const EditPageContent: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pageId = searchParams.get('id');
 
-  const handleSave = (data: any) => {
-    // Burada API çağrısı yapılabilir
+  const handleSave = (data: { title: string; content: string; slug: string }) => {
     console.log('Updating page:', data);
-    
-    // Başarılı güncelleme sonrası liste sayfasına yönlendir
+
     router.push('/pages/list');
   };
 
@@ -22,17 +20,15 @@ const EditPagePage: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    // Burada API çağrısı yapılabilir
     console.log('Deleting page:', id);
-    
-    // Başarılı silme sonrası liste sayfasına yönlendir
+
     router.push('/pages/list');
   };
 
   return (
     <div className="min-h-screen bg-gray-50/30">
       <div className="p-6">
-        <EditPageForm 
+        <EditPageForm
           pageId={pageId || undefined}
           onSave={handleSave}
           onCancel={handleCancel}
@@ -43,4 +39,13 @@ const EditPagePage: React.FC = () => {
   );
 };
 
+const EditPagePage: React.FC = () => {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50/30 flex items-center justify-center">Loading...</div>}>
+      <EditPageContent />
+    </Suspense>
+  );
+};
+
 export default EditPagePage;
+
